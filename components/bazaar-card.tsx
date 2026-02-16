@@ -1,19 +1,31 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
-import { MapPin, Clock, Store } from "lucide-react"
+import { MapPin, Clock, Store, Heart } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { StarRating } from "@/components/star-rating"
 import { FoodTypeBadge } from "@/components/food-type-badge"
+import { useFavorites } from "@/hooks/use-favorites"
 import type { Bazaar } from "@/lib/types"
 
 interface BazaarCardProps {
   bazaar: Bazaar
   variant?: "compact" | "full"
   className?: string
+  showFavorite?: boolean
 }
 
-export function BazaarCard({ bazaar, variant = "compact", className }: BazaarCardProps) {
+export function BazaarCard({ bazaar, variant = "compact", className, showFavorite = true }: BazaarCardProps) {
   const isCompact = variant === "compact"
+  const { toggleFavorite, isFavorite } = useFavorites()
+  const isFav = isFavorite(bazaar.id)
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    toggleFavorite(bazaar.id)
+  }
 
   return (
     <Link
@@ -48,6 +60,19 @@ export function BazaarCard({ bazaar, variant = "compact", className }: BazaarCar
           <span className={cn("h-1.5 w-1.5 rounded-full", bazaar.isOpen ? "bg-green-200" : "bg-red-200")} />
           {bazaar.isOpen ? "Buka" : "Tutup"}
         </span>
+        {showFavorite && (
+          <button
+            onClick={handleFavoriteClick}
+            className={cn(
+              "absolute top-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full transition-all",
+              "bg-card/90 backdrop-blur-sm shadow-sm hover:scale-110 active:scale-95",
+              isFav ? "text-red-500" : "text-muted-foreground hover:text-red-500"
+            )}
+            aria-label={isFav ? "Buang dari simpanan" : "Simpan bazaar"}
+          >
+            <Heart size={14} className={cn("transition-all", isFav && "fill-current")} strokeWidth={2.5} />
+          </button>
+        )}
       </div>
 
       <div className={cn("flex flex-col justify-between min-w-0", !isCompact && "p-3")}>

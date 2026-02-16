@@ -73,7 +73,7 @@ export function FilterSheet({ filters, onApply, activeCount }: FilterSheetProps)
         )}
       </Button>
 
-      <Drawer open={open} onOpenChange={setOpen}>
+      <Drawer open={open} onOpenChange={setOpen} modal={true}>
         <DrawerContent className="max-h-[85vh]">
           <DrawerHeader className="flex items-center justify-between pb-2">
             <div>

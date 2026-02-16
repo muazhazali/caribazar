@@ -106,7 +106,7 @@ export default function HomePage() {
             selectedId={selectedBazaar?.id}
           />
         ) : (
-          <div className="h-full overflow-y-auto bg-background p-4 pb-20">
+          <div className="absolute inset-0 overflow-y-auto bg-background p-4 pb-20">
             <div className="mx-auto max-w-lg flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground">
