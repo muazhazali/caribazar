@@ -1,6 +1,7 @@
 "use client"
 
-import { Moon, User } from "lucide-react"
+import { Moon, Sun, User } from "lucide-react"
+import { useTheme } from "next-themes"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { SearchBar } from "@/components/search-bar"
 import { QuickFilterChips } from "@/components/quick-filter-chips"
@@ -31,6 +32,8 @@ export function EnhancedHeader({
   onProfileClick,
   className
 }: EnhancedHeaderProps) {
+  const { theme, setTheme } = useTheme()
+
   return (
     <div
       className={cn(
@@ -41,10 +44,19 @@ export function EnhancedHeader({
       <div className="mx-auto max-w-lg px-4 py-3 space-y-3">
         {/* Top Row: Logo + Search + Profile */}
         <div className="flex items-center gap-3">
-          {/* Brand Logo */}
-          <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 shrink-0">
-            <Moon className="h-5 w-5 text-primary" strokeWidth={2.5} />
-          </div>
+          {/* Theme Toggle Button */}
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className={cn(
+              "flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 shrink-0",
+              "hover:bg-primary/20 active:bg-primary/30 transition-all",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            )}
+            aria-label="Toggle theme"
+          >
+            <Moon className="h-5 w-5 text-primary dark:hidden" strokeWidth={2.5} />
+            <Sun className="h-5 w-5 text-primary hidden dark:block" strokeWidth={2.5} />
+          </button>
 
           {/* Search Bar */}
           <SearchBar

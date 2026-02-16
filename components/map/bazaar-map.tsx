@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet"
+import { useTheme } from "next-themes"
 import L from "leaflet"
 import { Navigation, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -52,6 +53,7 @@ interface BazaarMapProps {
 export function BazaarMap({ bazaars, onMarkerClick, selectedId }: BazaarMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [shouldRender, setShouldRender] = useState(false)
+  const { resolvedTheme } = useTheme()
 
   useEffect(() => {
     // Cleanup any existing map instance
@@ -78,6 +80,15 @@ export function BazaarMap({ bazaars, onMarkerClick, selectedId }: BazaarMapProps
   // Center on KL
   const center: [number, number] = [3.1390, 101.6869]
 
+  // Choose tiles based on theme
+  const tileUrl = resolvedTheme === "dark"
+    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+
+  const tileAttribution = resolvedTheme === "dark"
+    ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+
   if (!shouldRender) {
     return (
       <div className="flex h-full w-full items-center justify-center bg-muted">
@@ -103,8 +114,9 @@ export function BazaarMap({ bazaars, onMarkerClick, selectedId }: BazaarMapProps
         }}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          key={resolvedTheme}
+          url={tileUrl}
+          attribution={tileAttribution}
         />
 
         {bazaars.map((bazaar) => {

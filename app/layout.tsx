@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
+import { ThemeProvider } from '@/components/theme-provider'
 
 import './globals.css'
 
@@ -29,8 +30,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ms">
-      <body className={`${inter.variable} font-sans antialiased`}>{children}</body>
+    <html lang="ms" suppressHydrationWarning>
+      <body className={`${inter.variable} font-sans antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   )
 }
