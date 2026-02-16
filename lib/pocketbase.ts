@@ -41,8 +41,8 @@ export interface PBUser {
   id: string
   username: string
   email: string
-  role: 'user' | 'mod' | 'admin'
-  avatar?: string
+  name?: string // Custom field for display name
+  avatar?: string // File field for profile image
   created: string
   updated: string
 }

@@ -58,7 +58,7 @@ export interface PBBazaarResponse {
   updated: string
   expand?: {
     food_types?: PBFoodType[]
-    reviews?: PBReview[]
+    reviews_via_bazaar?: PBReview[] // Back-relation from reviews collection
   }
 }
 
@@ -97,14 +97,20 @@ export function formatDate(isoDate: string): string {
 /**
  * Transform PocketBase review response to app Review type
  */
-export function transformReview(pb: PBReview): Review {
+export function transformReview(pbReview: PBReview): Review {
+  // Construct full URLs for review photos
+  const photos = (pbReview.photos || []).map((filename) =>
+    pb.files.getUrl(pbReview, filename)
+  )
+
   return {
-    id: pb.id,
-    userId: pb.user,
-    userName: pb.expand?.user?.username || 'Anonymous',
-    rating: pb.rating,
-    comment: pb.comment,
-    createdAt: formatDate(pb.created),
+    id: pbReview.id,
+    userId: pbReview.user,
+    userName: pbReview.expand?.user?.name || pbReview.expand?.user?.username || 'Anonymous',
+    rating: pbReview.rating,
+    comment: pbReview.comment,
+    photos,
+    createdAt: formatDate(pbReview.created),
   }
 }
 
@@ -118,9 +124,9 @@ export function transformBazaar(pb: PBBazaarResponse): Bazaar {
     ? pb.expand.food_types.map((ft) => ft.slug)
     : []
 
-  // Transform reviews if expanded
-  const reviews: Review[] = pb.expand?.reviews
-    ? pb.expand.reviews.map(transformReview)
+  // Transform reviews if expanded (using back-relation)
+  const reviews: Review[] = pb.expand?.reviews_via_bazaar
+    ? pb.expand.reviews_via_bazaar.map(transformReview)
     : []
 
   // Calculate computed fields

@@ -1,15 +1,6 @@
 PROGRESS TRACKER
 ================================
 
-COMPLETED:
-[✓] Connect to actual PocketBase backend
-    - Created PocketBase schema (food_types, bazaars, reviews, favorites)
-    - Seeded 15 food types and 8 bazaars
-    - Created type transformation layer (snake_case → camelCase)
-    - Created API module (lib/api/bazaars.ts)
-    - Migrated all pages from mock data to PocketBase
-    - Tested and verified connection
-
 UPCOMING TASKS:
 [ ] Implement user authentication (login/register)
 [ ] Implement bazaar submission with photo upload

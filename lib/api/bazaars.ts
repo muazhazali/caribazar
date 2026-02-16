@@ -10,7 +10,7 @@ import type { Bazaar } from '@/lib/types'
 export async function getBazaarById(id: string): Promise<Bazaar | null> {
   try {
     const record = await pb.collection('bazaars').getOne<PBBazaarResponse>(id, {
-      expand: 'food_types,reviews,reviews.user',
+      expand: 'food_types,reviews_via_bazaar,reviews_via_bazaar.user',
     })
 
     return transformBazaar(record)
@@ -37,7 +37,7 @@ export async function searchBazaars(query: string): Promise<Bazaar[]> {
 
     const records = await pb.collection('bazaars').getFullList<PBBazaarResponse>({
       filter,
-      expand: 'food_types,reviews',
+      expand: 'food_types,reviews_via_bazaar',
       sort: '-avg_rating,-created',
     })
 
@@ -56,7 +56,7 @@ export async function getAllBazaars(): Promise<Bazaar[]> {
   try {
     const records = await pb.collection('bazaars').getFullList<PBBazaarResponse>({
       filter: 'status = "approved"',
-      expand: 'food_types,reviews',
+      expand: 'food_types,reviews_via_bazaar',
       sort: '-avg_rating,-created',
     })
 
@@ -96,7 +96,7 @@ export async function filterBazaars(options: {
 
     const records = await pb.collection('bazaars').getFullList<PBBazaarResponse>({
       filter: filters.join(' && '),
-      expand: 'food_types,reviews',
+      expand: 'food_types,reviews_via_bazaar',
       sort: '-avg_rating,-created',
     })
 
@@ -130,7 +130,7 @@ export async function getBazaarsByIds(ids: string[]): Promise<Bazaar[]> {
 
     const records = await pb.collection('bazaars').getFullList<PBBazaarResponse>({
       filter: `(${idFilter}) && status = "approved"`,
-      expand: 'food_types,reviews',
+      expand: 'food_types,reviews_via_bazaar',
       sort: '-avg_rating',
     })
 

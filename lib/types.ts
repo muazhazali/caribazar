@@ -57,6 +57,7 @@ export interface Review {
   userName: string
   rating: number
   comment: string
+  photos: string[]
   createdAt: string
 }
 
