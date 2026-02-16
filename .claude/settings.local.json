@@ -14,7 +14,8 @@
       "Bash(NEXT_PUBLIC_POCKETBASE_URL=https://pb-bazar.muaz.app pnpm run test:crud:*)",
       "Bash(pnpm run test:auth:*)",
       "Bash(pnpm run test:favorites:*)",
-      "Bash(pnpm run test:integration:*)"
+      "Bash(pnpm run test:integration:*)",
+      "Bash(curl:*)"
     ]
   },
   "prefersReducedMotion": true

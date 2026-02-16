@@ -19,18 +19,28 @@ export async function addToFavorites(bazaarId: string): Promise<void> {
     syncedToCloud: false,
   })
 
+  // TEMPORARILY DISABLED: Cloud sync requires authentication
+  // TODO: Re-enable after implementing login/register pages
   // Sync to cloud if authenticated
-  if (isAuthenticated() && userId) {
+  if (false && isAuthenticated() && userId) {
     try {
-      await pb.collection('favorites').create({
+      // Verify the user and bazaar exist before creating favorite
+      const record = await pb.collection('favorites').create({
         user: userId,
         bazaar: bazaarId,
       })
 
       // Mark as synced
       await db.favorites.update(favoriteId, { syncedToCloud: true })
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to sync favorite to cloud:', error)
+
+      // If the error is due to authentication issues, clear the auth store
+      if (error?.status === 400 || error?.status === 401 || error?.status === 403) {
+        console.warn('Authentication issue detected. Favorites will remain local only.')
+        pb.authStore.clear()
+      }
+
       // Keep in local database even if cloud sync fails
     }
   }
@@ -46,8 +56,10 @@ export async function removeFromFavorites(bazaarId: string): Promise<void> {
   // Remove from local database
   await db.favorites.delete(favoriteId)
 
+  // TEMPORARILY DISABLED: Cloud sync requires authentication
+  // TODO: Re-enable after implementing login/register pages
   // Remove from cloud if authenticated
-  if (isAuthenticated() && userId) {
+  if (false && isAuthenticated() && userId) {
     try {
       // Find the favorite in PocketBase
       const records = await pb.collection('favorites').getFullList<PBFavorite>({

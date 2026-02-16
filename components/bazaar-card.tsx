@@ -27,6 +27,11 @@ export function BazaarCard({ bazaar, variant = "compact", className, showFavorit
     toggleFavorite(bazaar.id)
   }
 
+  // Check if photo exists and is not empty
+  const photoUrl = bazaar.photos && bazaar.photos[0] && bazaar.photos[0].trim() !== ''
+    ? bazaar.photos[0]
+    : null
+
   return (
     <Link
       href={`/bazaar/${bazaar.id}`}
@@ -38,17 +43,23 @@ export function BazaarCard({ bazaar, variant = "compact", className, showFavorit
     >
       <div
         className={cn(
-          "relative overflow-hidden rounded-lg shrink-0",
+          "relative overflow-hidden rounded-lg shrink-0 bg-muted",
           isCompact ? "h-20 w-20" : "h-40 w-full"
         )}
       >
-        <Image
-          src={bazaar.photos[0]}
-          alt={bazaar.name}
-          fill
-          className="object-cover transition-transform group-hover:scale-105"
-          sizes={isCompact ? "80px" : "100vw"}
-        />
+        {photoUrl ? (
+          <Image
+            src={photoUrl}
+            alt={bazaar.name}
+            fill
+            className="object-cover transition-transform group-hover:scale-105"
+            sizes={isCompact ? "80px" : "100vw"}
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full w-full text-muted-foreground">
+            <Store size={isCompact ? 32 : 48} />
+          </div>
+        )}
         <span
           className={cn(
             "absolute top-1.5 left-1.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold",
