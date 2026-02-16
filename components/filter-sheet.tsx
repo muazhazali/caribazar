@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { SlidersHorizontal, X } from "lucide-react"
+import { SlidersHorizontal, X, Clock, Star, Utensils } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Drawer,
@@ -88,62 +88,93 @@ export function FilterSheet({ filters, onApply, activeCount }: FilterSheetProps)
             </DrawerClose>
           </DrawerHeader>
 
-          <div className="overflow-y-auto px-4 pb-4">
+          <div className="overflow-y-auto px-4 pb-4 space-y-4">
             {/* Open Now Toggle */}
-            <div className="flex items-center justify-between py-3 border-b border-border">
-              <span className="text-sm font-medium text-foreground">Buka sekarang sahaja</span>
-              <button
-                onClick={() => setDraft((p) => ({ ...p, openOnly: !p.openOnly }))}
-                className={cn(
-                  "relative h-6 w-11 rounded-full transition-colors",
-                  draft.openOnly ? "bg-primary" : "bg-muted"
-                )}
-                role="switch"
-                aria-checked={draft.openOnly}
-              >
-                <span
+            <div className="bg-muted/30 rounded-lg p-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                    <Clock size={14} className="text-primary" strokeWidth={2.5} />
+                  </div>
+                  <span className="text-sm font-medium text-foreground">Buka sekarang</span>
+                </div>
+                <button
+                  onClick={() => setDraft((p) => ({ ...p, openOnly: !p.openOnly }))}
                   className={cn(
-                    "absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-card shadow transition-transform",
-                    draft.openOnly && "translate-x-5"
+                    "relative h-6 w-11 rounded-full transition-all duration-200",
+                    draft.openOnly ? "bg-primary" : "bg-muted"
                   )}
-                />
-              </button>
+                  role="switch"
+                  aria-checked={draft.openOnly}
+                >
+                  <span
+                    className={cn(
+                      "absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-card shadow transition-transform duration-200",
+                      draft.openOnly && "translate-x-5"
+                    )}
+                  />
+                </button>
+              </div>
             </div>
 
             {/* Min Rating */}
-            <div className="py-3 border-b border-border">
-              <span className="text-sm font-medium text-foreground">Penilaian minimum</span>
-              <div className="mt-2 flex gap-2">
+            <div className="bg-muted/30 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10">
+                  <Star size={14} className="text-amber-500" strokeWidth={2.5} />
+                </div>
+                <span className="text-sm font-medium text-foreground">Penilaian minimum</span>
+              </div>
+              <div className="flex gap-2 flex-wrap">
                 {[0, 3, 3.5, 4, 4.5].map((r) => (
                   <button
                     key={r}
                     onClick={() => setDraft((p) => ({ ...p, minRating: r }))}
                     className={cn(
-                      "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+                      "rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
+                      "active:scale-95",
                       draft.minRating === r
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-card text-muted-foreground hover:bg-card hover:text-foreground border border-border"
                     )}
                   >
-                    {r === 0 ? "Semua" : `${r}+`}
+                    {r === 0 ? "Semua" : (
+                      <span className="flex items-center gap-1">
+                        <Star size={10} className="fill-current" />
+                        {r}+
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Food Types */}
-            <div className="py-3">
-              <span className="text-sm font-medium text-foreground">Jenis makanan</span>
-              <div className="mt-2 flex flex-wrap gap-2">
+            <div className="bg-muted/30 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary/10">
+                  <Utensils size={14} className="text-secondary" strokeWidth={2.5} />
+                </div>
+                <div className="flex items-center justify-between flex-1">
+                  <span className="text-sm font-medium text-foreground">Jenis makanan</span>
+                  {draft.foodTypes.length > 0 && (
+                    <span className="text-xs text-muted-foreground">
+                      {draft.foodTypes.length} dipilih
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
                 {(Object.keys(FOOD_TYPE_LABELS) as FoodType[]).map((ft) => (
                   <button
                     key={ft}
                     onClick={() => toggleFoodType(ft)}
                     className={cn(
-                      "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+                      "rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
+                      "active:scale-95",
                       draft.foodTypes.includes(ft)
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-card text-muted-foreground hover:bg-card hover:text-foreground border border-border"
                     )}
                   >
                     {FOOD_TYPE_LABELS[ft]}

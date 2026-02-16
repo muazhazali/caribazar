@@ -10,39 +10,63 @@
 
 @layer base {
   :root {
-    --background: 40 33% 98%;
-    --foreground: 220 20% 14%;
+    /* Ramadan Theme - Light Mode */
+    --background: 0 0% 98%;
+    --foreground: 220 20% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 14%;
+    --card-foreground: 220 20% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 14%;
-    --primary: 142 72% 29%;
+    --popover-foreground: 220 20% 11%;
+    --primary: 158 64% 40%; /* Emerald-600 - Islamic Green */
     --primary-foreground: 0 0% 100%;
-    --secondary: 140 20% 94%;
-    --secondary-foreground: 142 72% 29%;
-    --muted: 40 20% 95%;
+    --secondary: 42 87% 45%; /* Amber-600 - Warm Accent */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 20% 96%;
     --muted-foreground: 220 10% 46%;
-    --accent: 45 93% 47%;
-    --accent-foreground: 220 20% 14%;
-    --destructive: 0 84% 60%;
+    --accent: 42 87% 45%;
+    --accent-foreground: 220 20% 11%;
+    --destructive: 0 72% 51%; /* Red-500 for closed status */
     --destructive-foreground: 0 0% 98%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 142 72% 29%;
-    --chart-1: 142 72% 29%;
-    --chart-2: 45 93% 47%;
+    --ring: 158 64% 40%;
+    --chart-1: 158 64% 40%;
+    --chart-2: 42 87% 45%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.75rem;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 142 72% 29%;
+    --sidebar-primary: 158 64% 40%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 140 20% 94%;
-    --sidebar-accent-foreground: 142 72% 29%;
+    --sidebar-accent-foreground: 158 64% 40%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 142 72% 29%;
+    --sidebar-ring: 158 64% 40%;
+  }
+
+  .dark {
+    /* Dark Mode Support */
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 14%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 14%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 158 64% 50%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 42 87% 55%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 42 87% 55%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 158 64% 50%;
   }
 }
 
@@ -53,6 +77,25 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Safe Area Insets for iOS devices */
+@supports (padding: max(0px)) {
+  .safe-area-inset-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+  .safe-area-inset-top {
+    padding-top: max(env(safe-area-inset-top), 0px);
+  }
+}
+
+/* Hide scrollbar for horizontal scroll */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* Leaflet marker pulse animation */

@@ -3,31 +3,16 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet"
 import L from "leaflet"
-import { Navigation } from "lucide-react"
+import { Navigation, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import type { Bazaar } from "@/lib/types"
+import { createEnhancedMarkerIcon, type MarkerStatus } from "./marker-icons"
 
 import "leaflet/dist/leaflet.css"
 
 // Global map instance tracking
 let mapInstance: L.Map | null = null
-
-function createMarkerIcon(isOpen: boolean): L.DivIcon {
-  const color = isOpen ? "#15803d" : "#dc2626"
-  const pulseColor = isOpen ? "rgba(21,128,61,0.3)" : "rgba(220,38,38,0.3)"
-  return L.divIcon({
-    className: "custom-marker",
-    html: `
-      <div style="position:relative;display:flex;align-items:center;justify-content:center;">
-        <div style="position:absolute;width:28px;height:28px;border-radius:50%;background:${pulseColor};animation:pulse 2s infinite;"></div>
-        <div style="width:16px;height:16px;border-radius:50%;background:${color};border:2.5px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);position:relative;z-index:2;"></div>
-      </div>
-    `,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-    popupAnchor: [0, -14],
-  })
-}
 
 function LocationButton() {
   const map = useMap()
@@ -44,12 +29,16 @@ function LocationButton() {
     <Button
       variant="outline"
       size="icon"
-      className="absolute bottom-4 right-4 z-[1000] h-10 w-10 rounded-full bg-card shadow-lg border-border"
+      className="absolute bottom-20 right-4 z-[999] h-12 w-12 rounded-full bg-card shadow-lg border-border hover:bg-card hover:scale-105 active:scale-95 transition-transform"
       onClick={handleLocate}
       aria-label="My location"
       disabled={locating}
     >
-      <Navigation size={16} className={locating ? "animate-pulse text-primary" : "text-foreground"} />
+      <Navigation
+        size={18}
+        className={locating ? "animate-spin text-primary" : "text-foreground"}
+        strokeWidth={2.5}
+      />
     </Button>
   )
 }
@@ -118,23 +107,48 @@ export function BazaarMap({ bazaars, onMarkerClick, selectedId }: BazaarMapProps
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
 
-        {bazaars.map((bazaar) => (
-          <Marker
-            key={bazaar.id}
-            position={[bazaar.lat, bazaar.lng]}
-            icon={createMarkerIcon(bazaar.isOpen)}
-            eventHandlers={{
-              click: () => onMarkerClick(bazaar),
-            }}
-          >
-            <Popup>
-              <div className="min-w-[160px]">
-                <p className="font-semibold text-sm">{bazaar.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{bazaar.district}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {bazaars.map((bazaar) => {
+          const status: MarkerStatus = bazaar.isOpen ? "open" : "closed"
+          const isSelected = bazaar.id === selectedId
+
+          return (
+            <Marker
+              key={bazaar.id}
+              position={[bazaar.lat, bazaar.lng]}
+              icon={createEnhancedMarkerIcon({
+                status,
+                rating: bazaar.rating,
+                isSelected
+              })}
+              eventHandlers={{
+                click: () => onMarkerClick(bazaar),
+              }}
+            >
+              <Popup className="custom-popup">
+                <div className="min-w-[180px] p-1">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <p className="font-semibold text-sm leading-tight">{bazaar.name}</p>
+                    {bazaar.rating >= 4.5 && (
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
+                        ⭐ {bazaar.rating}
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 text-muted-foreground mb-1">
+                    <MapPin size={10} />
+                    <p className="text-xs">{bazaar.district}, {bazaar.state}</p>
+                  </div>
+                  <Badge
+                    variant={bazaar.isOpen ? "default" : "destructive"}
+                    className="text-[10px] px-2 py-0.5"
+                  >
+                    {bazaar.isOpen ? "Buka" : "Tutup"}
+                  </Badge>
+                </div>
+              </Popup>
+            </Marker>
+          )
+        })}
 
         <LocationButton />
       </MapContainer>
