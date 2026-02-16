@@ -5,18 +5,35 @@ import { Heart, CloudOff } from "lucide-react"
 import { BottomNavigation } from "@/components/bottom-navigation"
 import { BazaarCard } from "@/components/bazaar-card"
 import { useFavorites } from "@/hooks/use-favorites"
-import { BAZAARS } from "@/lib/mock-data"
+import { getBazaarsByIds } from "@/lib/api/bazaars"
 import { isAuthenticated } from "@/lib/pocketbase"
+import type { Bazaar } from "@/lib/types"
 
 export default function SavedPage() {
   const { favoriteIds, isLoading } = useFavorites()
   const [isAuth, setIsAuth] = useState(false)
+  const [savedBazaars, setSavedBazaars] = useState<Bazaar[]>([])
+  const [loadingBazaars, setLoadingBazaars] = useState(false)
 
   useEffect(() => {
     setIsAuth(isAuthenticated())
   }, [])
 
-  const savedBazaars = BAZAARS.filter((bazaar) => favoriteIds.includes(bazaar.id))
+  // Fetch bazaars when favoriteIds change
+  useEffect(() => {
+    async function loadSavedBazaars() {
+      if (favoriteIds.length > 0) {
+        setLoadingBazaars(true)
+        const bazaars = await getBazaarsByIds(favoriteIds)
+        setSavedBazaars(bazaars)
+        setLoadingBazaars(false)
+      } else {
+        setSavedBazaars([])
+      }
+    }
+
+    loadSavedBazaars()
+  }, [favoriteIds])
 
   return (
     <div className="flex h-dvh flex-col bg-background">
@@ -38,7 +55,7 @@ export default function SavedPage() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 pb-20">
-        {isLoading ? (
+        {isLoading || loadingBazaars ? (
           <div className="flex items-center justify-center h-full">
             <div className="flex flex-col items-center gap-2">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />

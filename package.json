@@ -6,7 +6,8 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "init-pb": "tsx scripts/init-pocketbase.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -69,8 +70,10 @@
     "@types/node": "^22",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
+    "dotenv": "^17.3.1",
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.21.0",
     "typescript": "5.7.3"
   },
   "pnpm": {

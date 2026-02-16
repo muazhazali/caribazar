@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useCallback } from "react"
+import { useState, useMemo, useCallback, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { SlidersHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -15,7 +15,7 @@ import { EnhancedHeader } from "@/components/enhanced-header"
 import { BottomNavigation } from "@/components/bottom-navigation"
 import { FilterSheet, type FilterState } from "@/components/filter-sheet"
 import { BazaarCard } from "@/components/bazaar-card"
-import { BAZAARS, searchBazaars } from "@/lib/mock-data"
+import { getAllBazaars, searchBazaars as searchBazaarsAPI } from "@/lib/api/bazaars"
 import type { Bazaar } from "@/lib/types"
 import type { NavTab } from "@/components/bottom-navigation"
 
@@ -46,11 +46,36 @@ export default function HomePage() {
   const [drawerOpen, setDrawerOpen] = useState(true)
   const [openNowQuickFilter, setOpenNowQuickFilter] = useState(false)
   const [nearbyQuickFilter, setNearbyQuickFilter] = useState(false)
+  const [bazaars, setBazaars] = useState<Bazaar[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const showList = activeTab === "list"
 
+  // Load bazaars on mount and when search changes
+  useEffect(() => {
+    async function loadBazaars() {
+      setIsLoading(true)
+      try {
+        if (search) {
+          const results = await searchBazaarsAPI(search)
+          setBazaars(results)
+        } else {
+          const allBazaars = await getAllBazaars()
+          setBazaars(allBazaars)
+        }
+      } catch (error) {
+        console.error('Failed to load bazaars:', error)
+        setBazaars([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadBazaars()
+  }, [search])
+
   const filteredBazaars = useMemo(() => {
-    let results = search ? searchBazaars(search) : [...BAZAARS]
+    let results = [...bazaars]
 
     // Apply quick filters
     if (openNowQuickFilter || filters.openOnly) {
@@ -71,7 +96,7 @@ export default function HomePage() {
     // if (nearbyQuickFilter) { ... }
 
     return results
-  }, [search, filters, openNowQuickFilter, nearbyQuickFilter])
+  }, [bazaars, filters, openNowQuickFilter, nearbyQuickFilter])
 
   const activeFilterCount =
     (filters.openOnly ? 1 : 0) +
@@ -99,7 +124,14 @@ export default function HomePage() {
 
       {/* Main Content Area */}
       <div className="flex-1 relative">
-        {!showList ? (
+        {isLoading ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-background">
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              <span className="text-sm text-muted-foreground">Memuatkan bazaar...</span>
+            </div>
+          </div>
+        ) : !showList ? (
           <BazaarMap
             bazaars={filteredBazaars}
             onMarkerClick={handleMarkerClick}

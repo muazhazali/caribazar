@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Bazaar Ramadan Directory - A Progressive Web App (PWA) for discovering Ramadan bazaars across Malaysia. This is a community-driven platform with offline-first capabilities, built with Next.js and PocketBase.
 
-**Current Status**: Phase 6 complete - Core UI, favorites system, and profile/settings pages implemented. Using mock data while PocketBase integration is in progress.
+**Current Status**: Phase 7 complete - PocketBase backend integrated! Core UI, favorites system, profile/settings pages, and live data from PocketBase all working.
 
 ## Development Commands
 
@@ -22,13 +22,16 @@ pnpm start
 
 # Run linter
 pnpm lint
+
+# Initialize PocketBase schema (run once)
+pnpm run init-pb
 ```
 
 ## Tech Stack
 
 - **Frontend**: Next.js 16 (App Router), React 19, TypeScript 5.7
 - **UI**: Tailwind CSS 3.4, shadcn/ui components, Lucide icons
-- **Backend**: PocketBase (not yet deployed - using mock data)
+- **Backend**: PocketBase (deployed at pb-bazar.muaz.app)
 - **Maps**: Leaflet.js with React-Leaflet, OpenStreetMap tiles
 - **Offline**: Dexie.js (IndexedDB wrapper) for local persistence
 - **Forms**: React Hook Form with Zod validation
@@ -47,11 +50,12 @@ pnpm lint
   - `/ui` - shadcn/ui components (auto-generated, modify with care)
   - `/map` - Map-related components (Leaflet integration)
 - `/lib` - Core utilities and logic
-  - `types.ts` - TypeScript interfaces and type definitions
-  - `db.ts` - Dexie database schema (IndexedDB)
+  - `types.ts` - TypeScript interfaces (camelCase, app-level types)
+  - `pocketbase-types.ts` - PocketBase response types (snake_case) and transformations
+  - `db.ts` - Dexie database schema (IndexedDB for offline)
   - `pocketbase.ts` - PocketBase client configuration
-  - `favorites.ts` - Favorites management functions
-  - `mock-data.ts` - Mock bazaar data (temporary)
+  - `favorites.ts` - Favorites management with cloud sync
+  - `api/bazaars.ts` - Bazaar data API functions
   - `utils.ts` - Utility functions (cn, etc.)
 - `/hooks` - Custom React hooks (e.g., `use-favorites.ts`)
 - `/styles` - Global CSS files
@@ -68,10 +72,12 @@ pnpm lint
 - Most components use `"use client"` due to interactive features (maps, forms, favorites)
 - Server components used sparingly for static content
 
-**Data Flow**:
-1. Mock data from `lib/mock-data.ts` (temporary)
-2. Favorites stored in IndexedDB (`lib/db.ts`)
-3. PocketBase integration pending (schema in `PRD.md`)
+**Data Flow (PocketBase Integration)**:
+1. **API Layer**: `lib/api/bazaars.ts` fetches data from PocketBase
+2. **Transformation**: `lib/pocketbase-types.ts` converts snake_case responses to camelCase app types
+3. **Type Safety**: `lib/types.ts` defines app-level TypeScript interfaces (camelCase)
+4. **Offline Cache**: Favorites stored in IndexedDB (`lib/db.ts`) with cloud sync
+5. **Computed Fields**: `isOpen` and `reviewCount` calculated client-side during transformation
 
 ## Important Configuration
 
@@ -79,8 +85,13 @@ pnpm lint
 
 Copy `.env.local.example` to `.env.local`:
 ```bash
-NEXT_PUBLIC_POCKETBASE_URL=http://127.0.0.1:8090
+NEXT_PUBLIC_POCKETBASE_URL=https://pb-bazar.muaz.app
+POCKETBASE_URL=https://pb-bazar.muaz.app
+POCKETBASE_SU_EMAIL=your-admin@email.com
+POCKETBASE_SU_PASSWORD=your-admin-password
 ```
+
+**Note**: Admin credentials (`POCKETBASE_SU_*`) are only needed for running the schema initialization script (`pnpm run init-pb`). They are not used by the frontend application.
 
 ### Next.js Config Notes
 
@@ -129,15 +140,41 @@ Defined in `lib/db.ts`:
 
 **Never modify the schema version without migration plan**. Dexie auto-upgrades but data loss can occur.
 
-## PocketBase Collections (Future)
+## PocketBase Collections (Live)
 
-Schema defined in `PRD.md`:
-- **bazaars**: Main bazaar data (name, location, photos, status)
-- **food_types**: Available food categories
-- **users**: User accounts and roles
+Backend deployed at `https://pb-bazar.muaz.app`. Collections created and populated:
+
+- **food_types**: 15 food categories (nasi-lemak, satay, murtabak, etc.)
+  - Fields: `name`, `slug`, `icon`, `color_class`
+  - All public read access
+
+- **bazaars**: 8 bazaars imported from mock data
+  - Fields: `name`, `description`, `lat`, `lng`, `address`, `district`, `state`, `stall_count`, `food_types` (relation), `open_hours` (JSON), `photos`, `status`, `submitted_by` (relation), `avg_rating`
+  - Public can view approved bazaars
+  - Authenticated users can submit new bazaars
+
 - **reviews**: User reviews with ratings
-- **favorites**: Cloud-synced favorites
-- **reports**: User-submitted reports
+  - Fields: `bazaar` (relation), `user` (relation), `rating` (1-5), `comment`, `photos`
+  - Public read, authenticated write
+
+- **favorites**: User favorites with cloud sync
+  - Fields: `user` (relation), `bazaar` (relation)
+  - Private to each user
+
+**Type Transformation Layer** (`lib/pocketbase-types.ts`):
+- Converts PocketBase snake_case responses → camelCase app types
+- Functions: `transformBazaar()`, `transformReview()`, `calculateIsOpen()`
+- Handles relation expansion (food_types, reviews, users)
+- Computes derived fields (isOpen, reviewCount)
+
+**API Functions** (`lib/api/bazaars.ts`):
+- `getAllBazaars()` - Fetch all approved bazaars
+- `getBazaarById(id)` - Fetch single bazaar with reviews
+- `searchBazaars(query)` - Full-text search
+- `filterBazaars(options)` - Filter by food types, rating, open status
+- `getBazaarsByIds(ids)` - Batch fetch for favorites
+
+**Schema Updates**: See `PRD.md` for future collections (reports, etc.)
 
 ## Code Style Guidelines
 
