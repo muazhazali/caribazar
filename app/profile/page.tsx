@@ -73,8 +73,12 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-2">
-                <Button className="w-full">Log Masuk</Button>
-                <Button variant="outline" className="w-full">Daftar Akaun</Button>
+                <Button className="w-full" onClick={() => router.push("/login")}>
+                  Log Masuk
+                </Button>
+                <Button variant="outline" className="w-full" onClick={() => router.push("/register")}>
+                  Daftar Akaun
+                </Button>
               </div>
             </CardContent>
           </Card>

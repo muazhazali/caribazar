@@ -3,20 +3,30 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
-import { ChevronLeft, Moon, Sun, Monitor, Bell, Globe, Ruler } from "lucide-react"
+import { ChevronLeft, Moon, Sun, Monitor, Bell, Globe, Ruler, LogOut, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useAuth } from "@/hooks/use-auth"
+import { toast } from "sonner"
 
 export default function SettingsPage() {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
+  const { user, isAuthenticated, logout } = useAuth()
   const [notifications, setNotifications] = useState(true)
   const [newBazaarAlerts, setNewBazaarAlerts] = useState(true)
   const [distanceUnit, setDistanceUnit] = useState<"km" | "miles">("km")
   const [language, setLanguage] = useState<"ms" | "en">("ms")
+
+  const handleLogout = () => {
+    logout()
+    toast.success("Berjaya log keluar")
+    router.push("/")
+    router.refresh()
+  }
 
   return (
     <div className="flex h-dvh flex-col bg-background">
@@ -36,6 +46,35 @@ export default function SettingsPage() {
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 pb-6">
         <div className="mx-auto max-w-lg space-y-6">
+          {/* Account Section */}
+          {isAuthenticated && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <User size={16} />
+                  Akaun
+                </CardTitle>
+                <CardDescription className="text-sm">
+                  Urus akaun anda
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-sm">
+                  <div className="text-muted-foreground">Log masuk sebagai</div>
+                  <div className="font-medium">{user?.email}</div>
+                </div>
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={handleLogout}
+                >
+                  <LogOut size={16} className="mr-2" />
+                  Log Keluar
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Theme Settings */}
           <Card>
             <CardHeader>
@@ -201,10 +240,40 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-start">
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => {
+                  if (confirm("Kosongkan cache? Ini akan membuang semua data tempatan.")) {
+                    localStorage.clear()
+                    sessionStorage.clear()
+                    toast.success("Cache dikosongkan")
+                    setTimeout(() => window.location.reload(), 500)
+                  }
+                }}
+              >
                 Kosongkan Cache
               </Button>
-              <Button variant="outline" className="w-full justify-start text-destructive hover:text-destructive">
+              <Button
+                variant="outline"
+                className="w-full justify-start text-destructive hover:text-destructive"
+                onClick={() => {
+                  if (confirm("Padam semua data tempatan? Tindakan ini tidak boleh dibatalkan.")) {
+                    localStorage.clear()
+                    sessionStorage.clear()
+                    // Clear IndexedDB
+                    if (window.indexedDB) {
+                      indexedDB.databases().then((dbs) => {
+                        dbs.forEach((db) => {
+                          if (db.name) indexedDB.deleteDatabase(db.name)
+                        })
+                      })
+                    }
+                    toast.success("Data tempatan dipadam")
+                    setTimeout(() => window.location.href = "/", 500)
+                  }
+                }}
+              >
                 Padam Data Tempatan
               </Button>
             </CardContent>

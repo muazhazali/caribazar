@@ -339,8 +339,8 @@ async function initPocketBase() {
     console.log('\n✅ Initialization completed successfully!')
     console.log('\n📝 Next steps:')
     console.log('   1. Start your dev server: pnpm dev')
-    console.log('   2. Test the integration with: pnpm run test:crud')
-    console.log('   3. View your PocketBase admin panel at:', PB_URL + '/_/')
+    console.log('   2. View your PocketBase admin panel at:', PB_URL + '/_/')
+    console.log('   3. Test authentication by visiting /login or /register')
   } catch (error) {
     console.error('\n❌ Initialization failed:', error)
     process.exit(1)

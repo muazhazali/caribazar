@@ -42,6 +42,7 @@ export interface PBBazaar {
 export interface PBUser {
   id: string
   email: string
+  username: string
   name?: string // Custom field for display name
   avatar?: string // File field for profile image
   role?: 'user' | 'mod' | 'admin' // User role
@@ -57,4 +58,9 @@ export function isAuthenticated(): boolean {
 // Helper function to get current user
 export function getCurrentUser(): PBUser | null {
   return pb.authStore.model as PBUser | null
+}
+
+// Helper function to clear authentication
+export function clearAuth(): void {
+  pb.authStore.clear()
 }
