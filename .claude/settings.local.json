@@ -8,7 +8,14 @@
       "Bash(pnpm dev:*)",
       "Bash(pnpm run init-pb:*)",
       "Bash(pnpm run lint)",
-      "Bash(pnpm tsx:*)"
+      "Bash(pnpm tsx:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm run test:crud:*)",
+      "Bash(NEXT_PUBLIC_POCKETBASE_URL=https://pb-bazar.muaz.app pnpm run test:crud:*)",
+      "Bash(pnpm run test:auth:*)",
+      "Bash(pnpm run test:favorites:*)",
+      "Bash(pnpm run test:integration:*)"
     ]
-  }
+  },
+  "prefersReducedMotion": true
 }

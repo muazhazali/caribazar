@@ -23,6 +23,8 @@ export interface PBBazaar {
   lat: number
   lng: number
   address: string
+  district: string
+  state: string
   stall_count: number
   food_types: string[]
   open_hours: {
@@ -39,10 +41,10 @@ export interface PBBazaar {
 
 export interface PBUser {
   id: string
-  username: string
   email: string
   name?: string // Custom field for display name
   avatar?: string // File field for profile image
+  role?: 'user' | 'mod' | 'admin' // User role
   created: string
   updated: string
 }

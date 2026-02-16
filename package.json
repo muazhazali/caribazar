@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "init-pb": "tsx scripts/init-pocketbase.ts"
+    "init-pb": "tsx scripts/init-pocketbase.ts",
+    "test:crud": "tsx --env-file=.env.local scripts/test-crud.ts",
+    "test:auth": "tsx --env-file=.env.local scripts/test-auth.ts",
+    "test:favorites": "tsx --env-file=.env.local scripts/test-favorites.ts",
+    "test:integration": "tsx --env-file=.env.local scripts/test-integration.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

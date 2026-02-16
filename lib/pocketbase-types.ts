@@ -1,6 +1,6 @@
-import type { Bazaar, Review, FoodType } from './types'
+import type { Bazaar, Review, FoodType, Report } from './types'
 import type { PBUser } from './pocketbase'
-import { pb } from './pocketbase'
+import { pb as pbClient } from './pocketbase'
 
 /**
  * PocketBase response type for food_types collection
@@ -100,17 +100,33 @@ export function formatDate(isoDate: string): string {
 export function transformReview(pbReview: PBReview): Review {
   // Construct full URLs for review photos
   const photos = (pbReview.photos || []).map((filename) =>
-    pb.files.getUrl(pbReview, filename)
+    pbClient.files.getURL(pbReview as any, filename)
   )
 
   return {
     id: pbReview.id,
     userId: pbReview.user,
-    userName: pbReview.expand?.user?.name || pbReview.expand?.user?.username || 'Anonymous',
+    userName: pbReview.expand?.user?.name || 'Anonymous',
     rating: pbReview.rating,
     comment: pbReview.comment,
     photos,
     createdAt: formatDate(pbReview.created),
+  }
+}
+
+/**
+ * PocketBase response type for reports collection
+ */
+export interface PBReport {
+  id: string
+  bazaar: string
+  reason: string
+  details: string
+  status: 'pending' | 'resolved' | 'dismissed'
+  created: string
+  updated: string
+  expand?: {
+    bazaar?: PBBazaarResponse
   }
 }
 
@@ -135,7 +151,7 @@ export function transformBazaar(pb: PBBazaarResponse): Bazaar {
 
   // Construct full URLs for photos using PocketBase file helper
   const photos = (pb.photos || []).map((filename) =>
-    pb.files.getUrl(pb, filename)
+    pbClient.files.getURL(pb as any, filename)
   )
 
   return {
@@ -156,5 +172,20 @@ export function transformBazaar(pb: PBBazaarResponse): Bazaar {
     isOpen,
     photos,
     status: pb.status,
+  }
+}
+
+/**
+ * Transform PocketBase report response to app Report type
+ */
+export function transformReport(pb: PBReport): Report {
+  return {
+    id: pb.id,
+    bazaarId: pb.bazaar,
+    bazaarName: pb.expand?.bazaar?.name,
+    reason: pb.reason,
+    details: pb.details,
+    status: pb.status,
+    createdAt: formatDate(pb.created),
   }
 }

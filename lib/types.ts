@@ -83,3 +83,13 @@ export interface Bazaar {
   state: string
   status: "approved" | "pending" | "rejected"
 }
+
+export interface Report {
+  id: string
+  bazaarId: string
+  bazaarName?: string
+  reason: string
+  details: string
+  status: 'pending' | 'resolved' | 'dismissed'
+  createdAt: string
+}
