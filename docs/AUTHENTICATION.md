@@ -5,8 +5,7 @@ This document describes the authentication system implemented in the Bazaar Rama
 ## Overview
 
 The application uses **PocketBase** for authentication with support for:
-- Email/Password authentication
-- Google OAuth2 authentication
+- Google OAuth2 authentication (primary method)
 - Session management with automatic refresh
 - Client-side auth state management
 
@@ -40,25 +39,20 @@ POCKETBASE_URL=https://pb-bazar.muaz.app
 ### Login Page (`/login`)
 
 Features:
-- Email/password login form
-- Google OAuth2 login button
-- Link to registration page
+- Google OAuth2 login button (full-page redirect)
+- Simple, clean interface
 - Error handling with toast notifications
 - Loading states for better UX
-
-### Register Page (`/register`)
-
-Features:
-- User registration form (username, email, password, confirm password)
-- Google OAuth2 registration button
-- Password validation (min 8 characters)
-- Auto-login after successful registration
-- Link to login page
-- Duplicate email/username error handling
+- Auto-creates user account on first login
 
 ### OAuth2 Callback Page (`/auth/callback`)
 
-A minimal page that handles the OAuth2 redirect. This page is opened in a popup window during the OAuth2 flow and is automatically closed after successful authentication.
+Handles the OAuth2 redirect after successful Google authentication. This page:
+- Extracts the authorization code from URL parameters
+- Exchanges the code for an auth token
+- Creates user account if first-time login
+- Redirects to home page after successful authentication
+- Shows error message if authentication fails
 
 ## Authentication Hook
 
@@ -109,33 +103,19 @@ The settings page (`/settings`) includes:
 
 ## Authentication Flow
 
-### Email/Password Login
-
-1. User enters email and password
-2. Client calls `pb.collection('users').authWithPassword(email, password)`
-3. PocketBase validates credentials and returns auth token
-4. Token is stored in PocketBase authStore (localStorage)
-5. User is redirected to home page
-6. Auth state updates across all components using the hook
-
 ### Google OAuth2 Flow
 
-1. User clicks "Login with Google" button
-2. Client fetches OAuth2 providers from PocketBase
-3. OAuth2 URL is opened in a popup window
-4. User authenticates with Google
-5. Google redirects to `/auth/callback` with authorization code
-6. Client exchanges code for auth token using `pb.collection('users').authWithOAuth2Code()`
-7. Popup closes, user is authenticated
-8. User is redirected to home page
-
-### Registration
-
-1. User fills registration form
-2. Client validates inputs (password length, matching passwords, etc.)
-3. Client calls `pb.collection('users').create()` with user data
-4. After successful registration, auto-login is performed
-5. User is redirected to home page
+1. User clicks "Log Masuk dengan Google" button on `/login`
+2. Client fetches OAuth2 providers from PocketBase API
+3. Provider data is stored in localStorage for callback
+4. User is redirected to Google's OAuth2 consent page (full page redirect)
+5. User authenticates with Google and grants permissions
+6. Google redirects back to `/auth/callback` with authorization code
+7. Callback page exchanges code for auth token using `pb.collection('users').authWithOAuth2Code()`
+8. If first-time login, PocketBase automatically creates user account
+9. Auth token is stored in PocketBase authStore (localStorage)
+10. User is redirected to home page
+11. Auth state updates across all components using the `useAuth()` hook
 
 ### Logout
 
@@ -146,37 +126,41 @@ The settings page (`/settings`) includes:
 
 ## Security Features
 
-- **Password Requirements**: Minimum 8 characters
+- **OAuth2 Standard**: Uses industry-standard Google OAuth2
 - **HTTPS Only**: All authentication requests use HTTPS
-- **HTTP-Only Cookies**: PocketBase stores auth tokens securely
+- **Secure Token Storage**: PocketBase stores auth tokens in localStorage
 - **Auto Refresh**: PocketBase automatically refreshes expired tokens
 - **CSRF Protection**: Built-in with PocketBase
+- **No Password Management**: Eliminates password-related vulnerabilities
 
 ## Error Handling
 
-All authentication errors are handled gracefully with user-friendly messages:
+All authentication errors are handled gracefully with user-friendly Malay messages:
 
-- **Login errors**: "Log masuk gagal. Sila cuba lagi."
-- **Registration errors**: Specific messages for duplicate email/username
-- **OAuth2 errors**: "Log masuk dengan Google gagal"
+- **OAuth2 not configured**: "Google OAuth2 tidak dikonfigurasi. Sila hubungi admin."
+- **Provider not found**: "Google OAuth2 tidak dijumpai. Sila hubungi admin."
+- **Callback errors**: "Pengesahan gagal" with option to retry
 - **Network errors**: Handled by PocketBase client
+- **Missing parameters**: "Parameter OAuth2 tidak dijumpai"
 
 ## Testing
 
 To test the authentication system:
 
-1. Start the dev server: `pnpm dev`
-2. Visit `http://localhost:3000/register` to create a new account
-3. Try registering with email/password
-4. Try logging in with the created account
-5. Test Google OAuth2 (requires OAuth2 setup in PocketBase)
-6. Test logout functionality in settings
+1. **Ensure Google OAuth2 is configured in PocketBase** (see Setup section above)
+2. Start the dev server: `pnpm dev`
+3. Clear any existing auth state: Open console and run `localStorage.clear()`
+4. Visit `http://localhost:3000/login`
+5. Click "Log Masuk dengan Google"
+6. Complete Google authentication
+7. Verify you're redirected back and logged in
+8. Test logout functionality in settings
+9. Verify auth state persists after page refresh
 
 ## Future Enhancements
 
-- [ ] Password reset functionality
-- [ ] Email verification
-- [ ] Two-factor authentication (2FA)
 - [ ] Social login with Facebook, Apple
-- [ ] Profile photo upload
+- [ ] Profile photo upload from Google account
 - [ ] Account deletion
+- [ ] Multi-language support (English, Malay)
+- [ ] Remember device/session management
