@@ -63,16 +63,19 @@ pnpm run init-pb
 ### Key Patterns
 
 **Offline-First with Cloud Sync**:
+
 - All favorites are stored locally in IndexedDB via Dexie
 - Cloud sync happens when user is authenticated
 - Optimistic UI updates with automatic rollback on error
 - See `lib/favorites.ts` for implementation
 
 **Client Components**:
+
 - Most components use `"use client"` due to interactive features (maps, forms, favorites)
 - Server components used sparingly for static content
 
 **Data Flow (PocketBase Integration)**:
+
 1. **API Layer**: `lib/api/bazaars.ts` fetches data from PocketBase
 2. **Transformation**: `lib/pocketbase-types.ts` converts snake_case responses to camelCase app types
 3. **Type Safety**: `lib/types.ts` defines app-level TypeScript interfaces (camelCase)
@@ -84,6 +87,7 @@ pnpm run init-pb
 ### Environment Variables
 
 Copy `.env.local.example` to `.env.local`:
+
 ```bash
 NEXT_PUBLIC_POCKETBASE_URL=https://pb-bazar.muaz.app
 POCKETBASE_URL=https://pb-bazar.muaz.app
@@ -101,6 +105,7 @@ POCKETBASE_SU_PASSWORD=your-admin-password
 ### Path Aliases
 
 Configured in `tsconfig.json` and `components.json`:
+
 - `@/components` → `/components`
 - `@/lib` → `/lib`
 - `@/hooks` → `/hooks`
@@ -120,14 +125,14 @@ This project uses shadcn/ui with the "default" style and neutral base color.
 Leaflet requires client-side rendering and careful initialization:
 
 ```tsx
-'use client'
-import dynamic from 'next/dynamic'
+"use client";
+import dynamic from "next/dynamic";
 
 // Dynamically import Leaflet components with ssr: false
 const MapContainer = dynamic(
-  () => import('react-leaflet').then(mod => mod.MapContainer),
-  { ssr: false }
-)
+  () => import("react-leaflet").then((mod) => mod.MapContainer),
+  { ssr: false },
+);
 ```
 
 **Important**: Always disable SSR for Leaflet components. Check `components/map/bazaar-map.tsx` for reference implementation.
@@ -135,6 +140,7 @@ const MapContainer = dynamic(
 ## Database Schema (Dexie/IndexedDB)
 
 Defined in `lib/db.ts`:
+
 - **favorites**: Stores favorite bazaar IDs with sync status
 - **cachedBazaars**: Stores full bazaar data for offline access
 
@@ -162,12 +168,14 @@ Backend deployed at `https://pb-bazar.muaz.app`. Collections created and populat
   - Private to each user
 
 **Type Transformation Layer** (`lib/pocketbase-types.ts`):
+
 - Converts PocketBase snake_case responses → camelCase app types
 - Functions: `transformBazaar()`, `transformReview()`, `calculateIsOpen()`
 - Handles relation expansion (food_types, reviews, users)
 - Computes derived fields (isOpen, reviewCount)
 
 **API Functions** (`lib/api/bazaars.ts`):
+
 - `getAllBazaars()` - Fetch all approved bazaars
 - `getBazaarById(id)` - Fetch single bazaar with reviews
 - `searchBazaars(query)` - Full-text search
@@ -175,42 +183,3 @@ Backend deployed at `https://pb-bazar.muaz.app`. Collections created and populat
 - `getBazaarsByIds(ids)` - Batch fetch for favorites
 
 **Schema Updates**: See `PRD.md` for future collections (reports, etc.)
-
-## Code Style Guidelines
-
-- Use TypeScript strictly typed interfaces (see `lib/types.ts`)
-- Prefer `const` over `let`
-- Use destructuring for props
-- Components should have proper TypeScript types
-- Use `cn()` utility for conditional className joining
-- Follow existing patterns for consistency
-
-## Known Issues & Workarounds
-
-1. **Leaflet + React Strict Mode**: Strict mode disabled globally. If re-enabling, wrap map components in single-render logic.
-
-2. **Z-index layers**: Bottom navigation is at `z-1000`, modals/drawers must be `z-[1050]+` to appear above it. Already configured in `components/ui/drawer.tsx`.
-
-3. **List page scrolling**: Use `absolute inset-0` instead of `h-full` when parent has `flex-1`. See `app/page.tsx` for reference.
-
-4. **Mock data**: Currently using static data from `lib/mock-data.ts`. Replace with PocketBase API calls once backend is deployed.
-
-## Testing Checklist
-
-Before committing significant changes:
-- [ ] Test in both light and dark themes
-- [ ] Test on mobile viewport (375px)
-- [ ] Test offline functionality (disable network in DevTools)
-- [ ] Verify favorites sync (local storage working)
-- [ ] Check map markers render correctly
-- [ ] Ensure bottom navigation doesn't overlap content
-
-## Future Work
-
-See `todo.txt` and `PHASE_6_SUMMARY.md` for detailed task lists. High-priority items:
-- PocketBase deployment and integration
-- Authentication system (login/register)
-- Bazaar submission form with photo upload
-- Reviews and ratings system
-- PWA manifest and service workers
-- Admin dashboard for approvals

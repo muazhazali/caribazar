@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const bazaar = await getBazaarById(id)
   if (!bazaar) return { title: "Bazaar tidak dijumpai" }
   return {
-    title: `${bazaar.name} - Bazaar Ramadan`,
+    title: `${bazaar.name} - Cari Bazar`,
     description: bazaar.description,
   }
 }

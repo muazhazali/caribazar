@@ -10,9 +10,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Bazaar Ramadan - Cari Bazaar Berhampiran Anda',
-  description:
-    'Direktori Bazaar Ramadan seluruh Malaysia. Cari bazaar berhampiran, lihat menu, dan kongsi pengalaman anda.',
+  title: 'Cari Bazar - Cari Juadah Berbuka',
+  description: 'Cari Juadah Berbuka',
   generator: 'v0.app',
 }
 

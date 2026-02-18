@@ -176,7 +176,7 @@ export default function MorePage() {
 
         {/* App Info */}
         <div className="px-4 py-8 text-center">
-          <p className="text-xs text-muted-foreground">Bazaar Ramadan Directory v1.0</p>
+          <p className="text-xs text-muted-foreground">Cari Bazar v1.0</p>
           <p className="text-xs text-muted-foreground mt-1">Dibuat dengan ❤️ untuk komuniti Malaysia</p>
         </div>
       </div>

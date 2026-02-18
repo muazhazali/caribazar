@@ -13,7 +13,7 @@ export default function AboutPage() {
     {
       icon: Globe,
       title: "Peta Interaktif",
-      description: "Cari bazaar Ramadan dengan mudah menggunakan peta interaktif"
+      description: "Cari bazar dengan mudah menggunakan peta interaktif"
     },
     {
       icon: Heart,
@@ -57,9 +57,9 @@ export default function AboutPage() {
                 <span className="text-3xl">🌙</span>
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-foreground">Bazaar Ramadan</h2>
+            <h2 className="text-2xl font-bold text-foreground">Cari Bazar</h2>
             <p className="text-muted-foreground text-sm">
-              Direktori bazaar Ramadan berasaskan komuniti
+              Cari Juadah Berbuka
             </p>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
               Versi 1.0.0 Beta
@@ -180,7 +180,7 @@ export default function AboutPage() {
           {/* Footer */}
           <div className="text-center text-xs text-muted-foreground space-y-1 pt-4">
             <p>Dibuat dengan ❤️ untuk komuniti</p>
-            <p>© 2025 Bazaar Ramadan. Semua hak terpelihara.</p>
+            <p>© 2025 Cari Bazar. Semua hak terpelihara.</p>
             <p className="text-[10px]">
               Powered by Next.js, PocketBase & OpenStreetMap
             </p>
