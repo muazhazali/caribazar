@@ -15,7 +15,13 @@
       "Bash(pnpm run test:auth:*)",
       "Bash(pnpm run test:favorites:*)",
       "Bash(pnpm run test:integration:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm exec vitest:*)",
+      "Bash(findstr:*)",
+      "Bash(python3:*)",
+      "Bash(node -e:*)",
+      "Bash(echo:*)"
     ]
   },
   "prefersReducedMotion": true
